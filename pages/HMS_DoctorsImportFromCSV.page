@@ -1,0 +1,79 @@
+<apex:page id="HMS_DoctorsImportFromCSV" controller="HMS_DoctorImportToCSVController">
+    <apex:includeScript value="{!$Resource.jquery}"/>
+    <apex:includeScript value="{!$Resource.jqueryui}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jquerypackage, '/jquery-ui-1.12.1.custom/jquery-ui.css')}"/>
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="4">
+                <apex:inputHidden id="hiddenBlob" value="{!csvAsString}"/>
+                <input type="file" accept=".csv" id="csv"
+                       onchange="ValidateSingleInput(this);getBody()"/>
+                <apex:commandButton value="{!$Label.HMS_Process}" action="{!importCSVFile}"/>
+                <apex:commandButton value="{!$Label.HMS_Download_CSV_Template}" action="{!downloadtamplateCSV}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock >
+            <apex:pageblocktable id="importTable" value="{!docList}" var="doc" >
+                <apex:column headerValue="{!$Label.HMS_ToImport}">
+                    <apex:inputCheckbox value="{!doc.check}"/>
+                </apex:column>
+                <apex:column value="{!doc.doctor.Name}"/>
+                <apex:column value="{!doc.doctor.LastName__c}"/>
+                <apex:column value="{!doc.doctor.Email__c}"/>
+                <apex:column value="{!doc.doctor.Country__c}"/>
+                <apex:column value="{!doc.doctor.Phone__c }"/>
+                <apex:column headerValue="{!$Label.HMS_Status_Doctor_Import}">
+                {!doc.status}
+                    <apex:commandLink rendered="{!doc.status == $Label.HMS_Succes && doc.check}"  value="{!$Label.HMS_View}" onclick="window.open('/apex/NewDoctorLayout?id={!doc.doctor.Id}')"/>
+                </apex:column>
+            </apex:pageblocktable>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="{!$Label.HMS_Select_All}" action="{!checkAll}" style="float: left;"
+                                    reRender="importTable"/>
+                <apex:commandButton value="{!$Label.HMS_Reverse}" action="{!reverse}" style="float: left;" reRender="importTable"/>
+                <apex:commandButton value="{!$Label.HMS_Deselect_Btn}" action="{!deselect}" style="float: left;" reRender="importTable"/>
+                <apex:commandButton value="{!$Label.HMS_Import}" action="{!importDoctors}" style="float: right;"
+                                    reRender="importTable"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+    <script>
+        function getBody() {
+            var file = document.getElementById('csv');
+            if (file.files.length) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    console.log(e.target.result);
+                    $('[id$=hiddenBlob]').val(e.target.result);
+                };
+                reader.readAsText(file.files[0], 'utf-8');
+
+            }
+        }
+        var _validFileExtensions = [".csv"];
+        function ValidateSingleInput(oInput) {
+            if (oInput.type == "file") {
+                var sFileName = oInput.value;
+                if (sFileName.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            break;
+                        }
+                    }
+                    if (!blnValid) {
+                        alert("{!$Label.HMS_Sorry}, " + sFileName + " {!$Label.HMS_Invalid_Extension} " + _validFileExtensions.join(", "));
+                        oInput.value = "";
+                        return false;
+                    } else {
+                        console.log($('#csv').val().responseText);
+                        $('#hiddenBlob').value = oInput.files[0];
+                    }
+                }
+            }
+            return true;
+        }
+    </script>
+</apex:page>

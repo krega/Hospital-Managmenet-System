@@ -1,0 +1,20 @@
+<apex:page id="HMS_HospitalEdit" standardController="HMS_Hospital__c">
+        <apex:form >
+            <apex:pageBlock title="{!$Label.HMS_Hospital_Details}" mode="edit">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!save}" value="{!$Label.HMS_Save}"/>
+                    <apex:commandButton action="{!cancel}" value="{!$Label.HMS_Cancel_Btn}" immediate="true"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection title="{!$Label.HMS_Hospital_Details}" columns="2">
+                    <apex:inputField value=" {!HMS_Hospital__c.Name}"/>
+                    <apex:inputField value=" {!HMS_Hospital__c.Email__c}"/>
+                    <apex:inputField value=" {!HMS_Hospital__c.Website__c}"/>
+                    <apex:inputField value="{!HMS_Hospital__c.Phone__c}"/>
+                    <apex:inputField value="{!HMS_Hospital__c.City__c}"/>
+                    <apex:inputField value="  {!HMS_Hospital__c.Street__c}"/>
+                    <apex:inputField value="  {!HMS_Hospital__c.House_Number__c}"/>
+                    <apex:inputField value=" {!HMS_Hospital__c.Country__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:form>
+</apex:page>

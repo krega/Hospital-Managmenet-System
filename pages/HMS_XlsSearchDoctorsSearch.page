@@ -1,0 +1,10 @@
+<apex:page id="HMS_XlsSearchDoctorsSearch" controller="HMS_DoctorSearchController"
+               contenttype="application/vnd.ms-excel#Demo Example.xls" sidebar="false">
+        <apex:pageBlock id="resultTable">
+            <apex:pageBlockTable value="{!doctors}" var="c" title="{!$Label.HMS_Doctor_Title}">
+                <apex:column headerValue="{!$Label.HMS_Full_Name_Doctor}" value="{!c.Name} {!c.LastName__c}"/>
+                <apex:column value="{!c.Email__c}"/>
+                <apex:column value="{!c.Country__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:page>

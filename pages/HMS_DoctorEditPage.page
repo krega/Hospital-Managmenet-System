@@ -1,0 +1,27 @@
+<apex:page id="HMS_DoctorEditPage" standardController="HMS_Doctor__c">
+    <apex:form >  
+        <apex:pageBlock title="{!$Label.HMS_My_Doctor_Title}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="{!$Label.HMS_Save}"/>
+                <apex:commandButton action="{!cancel}" value="{!$Label.HMS_Cancel_Btn}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.HMS_Doctor_Details}" columns="1">
+                <apex:pageBlockSection title="{!$Label.HMS_Doctor_Details}" >
+                    <apex:inputField value=" {!HMS_Doctor__c.Name}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.LastName__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Phone__c}"/>
+                    <apex:inputField value="{!HMS_Doctor__c.LicensceNumber__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Others}" columns="1">
+                    <apex:inputField value="{!HMS_Doctor__c.Birthday__c}"/>
+                    <apex:inputField value="  {!HMS_Doctor__c.Email__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Address}" columns="1">
+                    <apex:inputField value="  {!HMS_Doctor__c.City__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Street__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Country__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

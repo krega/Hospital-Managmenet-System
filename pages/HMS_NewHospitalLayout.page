@@ -1,0 +1,74 @@
+<apex:page id="HMS_HospitalLayout" standardController="HMS_Hospital__c" extensions="HMS_LicenseChangeController">
+    <apex:form id="hospital">
+        <apex:includeScript value="{!$Resource.jquery}"/>
+        <apex:pageBlock title="Hospitals Details" id="section1">
+            <apex:pageBlockButtons >
+                <apex:commandButton value=" Edit "
+                                    onclick="window.open('/apex/EditHospitalPage?id={!HMS_Hospital__c.Id}')"
+                                    reRender="two"/>
+                <apex:commandButton value=" Delete " action="{!URLFOR($Action.HMS_Hospital__c.Delete,HMS_Hospital__c.Id)}"/>
+                <apex:commandButton value=" Clone " action="{!URLFOR($Action.HMS_Hospital__c.Clone,HMS_Hospital__c.id)}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Details" columns="2" id="section2">
+                <apex:outputField value=" {!HMS_Hospital__c.Name}"/>
+                <apex:outputField value=" {!HMS_Hospital__c.Email__c}"/>
+                <apex:outputField value=" {!HMS_Hospital__c.Website__c}"/>
+                <apex:outputField value="{!HMS_Hospital__c.Phone__c}"/>
+
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Address" columns="2" collapsible="true" id="address">
+                <apex:outputField value="{!HMS_Hospital__c.City__c}"/>
+                <apex:outputField value="  {!HMS_Hospital__c.Street__c}"/>
+                <apex:outputField value="  {!HMS_Hospital__c.House_Number__c}"/>
+                <apex:outputField value=" {!HMS_Hospital__c.Country__c}"/>
+                <style>
+                    #map1 {
+                          height: 200px;
+                          width: 200%;
+                        float: right;
+                      }
+                    #map2 {
+                        float: right;
+                        height: 200px;
+                        width: 200%;
+                    }
+                </style>
+                <apex:outputPanel rendered="{!isLicenseNumberEnabled}" id="map1">
+                <div id="map2" >
+                    <script language="JavaScript">
+                        function initMap() {
+                            var geocoder = new google.maps.Geocoder();
+                            var map = new google.maps.Map(document.getElementById('map2'), {
+                                zoom: 13
+                            });
+                            geocodeAddress(geocoder, map);
+                        }
+
+                        function geocodeAddress(geocoder, resultsMap) {
+                            var address = "{!HMS_Hospital__c.Street__c}, " + "{!HMS_Hospital__c.City__c}, " + "{!HMS_Hospital__c.Country__c}";
+                            geocoder.geocode({
+                                'address': address
+                            }, function (results, status) {
+                                if (status === 'OK') {
+                                    resultsMap.setCenter(results[0].geometry.location);
+                                    var marker = new google.maps.Marker({
+                                        map: resultsMap,
+                                        position: results[0].geometry.location
+                                    });
+                                } else {
+                                }
+                            });
+                        }
+                    </script>
+                </div>
+                </apex:outputPanel>
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqTxQuvrH5P3iTCk7Ks2O9U9WZwYeYI4o&callback=initMap"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:relatedList list="Contracts__r"/>
+    <script>
+        console.log(document.getElementById('address'));
+        twistSection(document.getElementById('{!$Component.hospital.section1.address}').getElementsByTagName('img')[0]);
+    </script>
+</apex:page>

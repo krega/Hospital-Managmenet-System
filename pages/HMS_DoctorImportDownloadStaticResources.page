@@ -1,0 +1,8 @@
+<!--
+ - Created by BRITENET on 08.11.2019.
+ -->
+
+<apex:page id="HMS_DoctorImportDownloadStaticResources" controller="ImportDoctorToCSVController" cache="true" contentType="text/csv#Export.csv" language="en-US" >Anna,Kot,PL,Gdynia,+48776554332,akot@doctor.com;
+    Ryszard,Lubicz,PL,Lublin,+48908675234,rlubicz@doctor.com;
+
+</apex:page>

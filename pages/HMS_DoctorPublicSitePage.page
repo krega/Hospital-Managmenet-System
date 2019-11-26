@@ -1,0 +1,15 @@
+<!--
+ - Created by BRITENET on 07.11.2019.
+ -->
+
+<apex:page id="HMS_DoctorPublicSitePage"  standardController="HMS_Doctor__c" extensions="HMS_DoctorPublicSite" >
+    <apex:form >
+        <apex:pageBlock id="resultTable" title="{!$Label.HMS_Random_Doctor_List}">
+            <apex:pageBlockTable value="{!listOfRandomDoctors}" var="doctors">
+                <apex:column headerValue="$Label.Full name"
+                             value="{!doctors.Name} {!doctors.LastName__c}"/>
+                <apex:column title="{!$Label.HMS_Doctor_Email}" value="{!doctors.Email__c}"   />
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

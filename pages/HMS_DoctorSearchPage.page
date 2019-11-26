@@ -1,0 +1,69 @@
+<apex:page id="HMS_DoctorSearchPage" controller="HMS_DoctorSearchController">
+    <c:Loading />
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="{!$Label.HMS_Search_Btn}" action="{!searchDoctor}" reRender="resultTable"  status="status"/>
+                <apex:commandButton value="{!$Label.HMS_Clear_Btn}" action="{!reset}"/>
+                <apex:commandButton value="{!$Label.HMS_Export_As_Excel_Btn}" action="{!SaveAsExcel}"/>
+                <apex:commandButton value="{!$Label.HMS_Export_As_Csv_Btn}" action="{!exportToCSV}" />
+                <apex:commandButton value="{!$Label.HMS_Export_As_Json}" action="{!exportToJson}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="contact-table">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.HMS_Doctor_Name}"/>
+                    <apex:inputText value="{!searchItem.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.HMS_Doctor_Country}"/>
+                    <apex:inputField value="{!searchItem.Country__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.HMS_Doctor_LastName}"/>
+                    <apex:inputText value="{!searchItem.LastName__c}" required="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.HMS_Doctor_Email}"/>
+                    <apex:inputText value="{!searchItem.Email__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock id="resultTable" title="{!$Label.HMS_Result}">
+            <apex:pageBlockTable value="{!paginatedDoctors}" var="c" title="{!$Label.HMS_Doctor_Title}">
+                <apex:column headervalue="Action">
+                    <apex:commandLink onclick="window.open('/apex/EditDoctorPage?id={!c.Id}')">{!$Label.HMS_Edit_Doctor_Btn}
+                    </apex:commandLink>
+                    <apex:commandLink onclick="window.open('/apex/NewDoctorLayout?id={!c.Id}')">{!$Label.HMS_View}
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="{!$Label.HMS_Full_Name_Doctor}" value="{!c.Name} {!c.LastName__c}">
+                    <apex:facet name="header">
+                        <apex:commandLink value="{!$Label.HMS_Full_Name_Doctor}" reRender="resultTable" action="{!sortByName}">
+                            <apex:commandLink value="{!IF(sortByColumn=='Name',IF(order='ASC','▼','▲'),'')}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                </apex:column>
+                <apex:column value="{!c.Email__c}" >
+                    <apex:facet name="header">
+                        <apex:commandLink value="{!$Label.HMS_Doctor_Email}" action="{!sortByEmail}" reRender="resultTable">
+                            <apex:commandLink value="{!IF(sortByColumn=='Email__c',IF(order='ASC','▼','▲'),'')}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                </apex:column>
+                <apex:column value="{!c.Country__c}" >
+                    <apex:facet name="header">
+                        <apex:commandLink value="{!$Label.HMS_Doctor_Country}" action="{!sortByCountry}" reRender="resultTable">
+                            <apex:commandLink value="{!IF(sortByColumn=='Country__c',IF(order='ASC','▼','▲'),'')}" />
+                        </apex:commandLink>
+                    </apex:facet>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:pageblockButtons location="Top">
+                <apex:outputPanel id="myButtons">
+                    <apex:commandButton value="{!$Label.HMS_Previous_Btn}" action="{!previous}" reRender="myButtons,resultTable"/>
+                    <apex:commandButton value="{!$Label.HMS_Next_Btn}" action="{!next}" reRender="myButtons,resultTable"/>
+                </apex:outputPanel>
+            </apex:pageblockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

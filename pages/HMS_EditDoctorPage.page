@@ -1,0 +1,222 @@
+<apex:page id="HMS_EditDoctorPage" standardController="HMS_Doctor__c" extensions="HMS_DoctorImageUpload">
+    <apex:form >
+        <apex:includeScript value="{!$Resource.jquery}"/>
+        <apex:includeScript value="{!$Resource.jqueryui}"/>
+        <apex:includeScript value="{!$Resource.jcrop}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jquerypackage, '/jquery-ui-1.12.1.custom/jquery-ui.css')}"/>
+        <apex:pageBlock title="{!$Label.HMS_My_Doctor_Title}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="{!$Label.HMS_Save}"/>
+                <apex:commandButton action="{!cancel}" value="{!$Label.HMS_Cancel_Btn}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <div class="photoContent">
+                <apex:outputPanel id="DoctorPhoto">
+                    <apex:image id="image"
+                                url="{!$Resource.doctorTemplate}"
+                                rendered="{!attachment.id == null}" width="200" height="200"/>
+                    <apex:actionFunction action="{!setLastAttachment}" name="fetchDoctorImage"/>
+                    <apex:actionFunction action="{!deleteImages}" name="removeDoctorImage"/>
+                    <apex:actionFunction name="rerenderDoctorImage" rerender="DoctorProfileImage,image"/>
+                    <apex:image url="/servlet/servlet.FileDownload?file={!attachment.id}" id="DoctorProfileImage"
+                                rendered="{!attachment.id != null}" width="200" height="200"/>
+                </apex:outputPanel>
+                <apex:commandButton value="{!$Label.HMS_Upload_Image_Doctor} "
+                                    onClick="$('#imgInp').val('');$('#newPhotoDialog').dialog('open'); return false; "
+                                    immediate="true"
+                                    status="status"
+                                    reRender="DoctorViewForm"/>
+
+                <apex:commandButton value="{!$Label.HMS_Delete_Image_Doctor_Btn}"
+                                    onClick="$('#photoDeleteConfirm').dialog('open'); return false; "
+                                    immediate="true"
+                                    status="status"
+                                    rendered="{!hasAttachment}"
+                />
+            </div>
+            <div class="DoctorFormUploadButtons">
+
+            </div>
+            <div id="newPhotoDialog">
+                <apex:pageBlock id="PictureUploadBlock">
+                    <apex:pageBlockSection >
+                        <input type='file' accept=".jpeg, .jpg, .png" id="imgInp"/>
+                    </apex:pageBlockSection>
+                    <div id="photoDialogContent">
+                        <div id="targetContainer">
+                            <img id="target" class="crop" src="#" style="border:1px solid;"/>
+                        </div>
+                        <div class="centerContent">
+                            <canvas id="preview" width="200" height="200"
+                                    style=" border:1px solid;"></canvas>
+                        </div>
+                    </div>
+                    <div id="newPhotoSave" class="centerContent">
+                        <apex:commandButton value="{!$Label.HMS_Save}"
+                                            onClick="saveImage();$('#newPhotoDialog').dialog('close'); return false;"
+                                            reRender="false"
+                        />
+                    </div>
+                </apex:pageBlock>
+            </div>
+            <div id="photoDeleteConfirm">
+                <apex:pageBlock >
+                    <apex:actionFunction name="deleteDoctorImages"
+                                         rerender="DoctorDetailsBlock,DoctorProfileImage,DoctorViewForm"/>
+                    <div class="centerContent photoDeleteButtons">
+                        <apex:commandButton value="{!$Label.HMS_Cancel_Btn}"
+                                            onClick="$('#photoDeleteConfirm').dialog('close'); return false;"/>
+                        <apex:commandButton value="{!$Label.HMS_Confirm_Image_Btn}"
+                                            onClick="deleteDoctorImages();$('#photoDeleteConfirm').dialog('close'); return false;"/>
+                    </div>
+                </apex:pageBlock>
+            </div>
+            <apex:pageBlockSection title="{!$Label.HMS_Doctor_Details}" columns="1">
+                <apex:pageBlockSection title="{!$Label.HMS_Doctor_Details}">
+                    <apex:inputField value=" {!HMS_Doctor__c.Name}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.LastName__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Phone__c}"/>
+                    <apex:inputField value="{!HMS_Doctor__c.LicensceNumber__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Others}" columns="1">
+                    <apex:inputField value="{!HMS_Doctor__c.Birthday__c}"/>
+                    <apex:inputField value="  {!HMS_Doctor__c.Email__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Address}" columns="1">
+                    <apex:inputField value="  {!HMS_Doctor__c.City__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Street__c}"/>
+                    <apex:inputField value=" {!HMS_Doctor__c.Country__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <script type="text/javascript">
+               window.$Label = window.$Label || {};
+    $Label.MaxSize = '{!($Label.HMS_Max_Size_In_Image)}';
+    $Label.photoDelete = '{!($Label.HMS_Delete_Photo)}';
+    $Label.maxInput = '{!($Label.HMS_max_Input_Size)}';
+    $Label.PhotoDialog = '{!($Label.HMS_Upload_New_photo)}';
+    $Label.PhotoDelete ='{!($Label.HMS_Hire_Doctor_Title)}';
+        const inputInvalid = $Label.MaxSize;
+        const photoDialogTitle = $Label.PhotoDialog ;
+        const photoDeleteTitle =  $Label.photoDelete;
+        const maxInputSize = $Label.maxInput;
+        const titleDeleteDoctor =   $Label.PhotoDelete;
+
+                console.log('editdoctorpage');
+                $(function () {
+                    $("#newPhotoDialog").dialog({
+                        autoOpen: false,
+                        title: photoDialogTitle,
+                        maxWidth: 800,
+                        maxHeight: 700,
+                        width: 700,
+                    });
+                    $("#popup").dialog({
+                        autoOpen: false,
+                        title: titleDeleteDoctor,
+                        maxWidth: 800,
+                        maxHeight: 700,
+                        width: 700,
+                    });
+
+                    $("#photoDeleteConfirm").dialog({
+                        autoOpen: false,
+                        title: photoDeleteTitle,
+                        maxWidth: 800,
+                        maxHeight: 700,
+                        width: 500,
+                    });
+
+                    $("#newPhotoSave").hide();
+                    $("#photoDialogContent").hide();
+                    $("#newPhotoDialog").on("dialogopen", function (event, ui) {
+                        clearSourceAndPreview();
+                        $("#photoDialogContent").hide();
+                    });
+                    $("#DoctorPeriodsForm").hide();
+
+                });
+                $("#imgInp").change(function () {
+                    readURL(this);
+                });
+
+                function clearSourceAndPreview() {
+                    $("#targetContainer").html('');
+                    let newImage = $(' <img id="target" class="crop" src="#"/>');
+                    $("#targetContainer").prepend(newImage);
+                    canvas = $("#preview")[0];
+                    var context = canvas.getContext("2d");
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    $("#newPhotoSave").hide();
+                }
+
+                function readURL(input) {
+                    if (input.files[0].size > maxInputSize || !(validFileType(input.files[0]))) {
+                        window.alert(inputInvalid);
+                        return false;
+                    }
+                    if (input.files && input.files[0]) {
+                        $("#photoDialogContent").show();
+                        $("#target").css("display", "block");
+                        $("#preview").css("display", "block");
+                        fileName = input.files[0].name;
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            clearSourceAndPreview();
+                            $('#target').attr('src', e.target.result);
+                            $('#target').Jcrop({
+                                onChange: updatePreview,
+                                onSelect: updatePreview,
+                                boxWidth: 600,
+                                aspectRatio: 1
+                            });
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+
+                function updatePreview(c) {
+                    if (parseInt(c.w) > 0) {
+                        var imageObj = $("#target")[0];
+                        canvas = $("#preview")[0];
+                        var context = canvas.getContext("2d");
+                        context.drawImage(imageObj, c.x, c.y, c.w, c.h, 0, 0, canvas.width, canvas.height);
+                    }
+                    $("#newPhotoSave").show();
+                };
+
+                function onSaveResult(result, event) {
+                    fetchDoctorImage();
+                    rerenderDoctorImage();
+                    canvas = $("#preview")[0];
+                    return false;
+                }
+
+                function saveImage() {
+                    var parent = '{!HMS_Doctor__c.id}';
+                    var p1 = canvas.toDataURL("image/png").match(/data:(.+);base64,(.+)/);
+                    {!$RemoteAction.HMS_DoctorImageUpload.saveImage}(fileName, p1[1], p1[2], parent, onSaveResult);
+                    return false;
+                }
+
+                function validFileType(file) {
+                    var fileTypes = [
+                        'image/jpeg',
+                        'image/jpg',
+                        'image/png'
+                    ];
+                    for (var i = 0; i < fileTypes.length; i++) {
+                        if (file.type === fileTypes[i]) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                function deleteDoctorImages() {
+                    removeDoctorImage();
+                    rerenderDoctorImage();
+                }
+
+    </script>
+</apex:page>

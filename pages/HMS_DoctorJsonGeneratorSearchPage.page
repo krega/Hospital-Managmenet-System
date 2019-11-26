@@ -1,0 +1,7 @@
+<!--
+ - Created by BRITENET on 08.11.2019.
+ -->
+
+<apex:page id="HMS_DoctorJsonGeneratorSearchPage" controller="HMS_DoctorSearchController" contentType="application/json#search.json">
+        {!searchJson}
+</apex:page>

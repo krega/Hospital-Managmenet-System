@@ -1,0 +1,36 @@
+<apex:page id="HMS_DoctorAsPDFPage" standardController="HMS_Doctor__c"
+           extensions="HMS_DoctorHireController,HMS_DoctorControllerExtension,HMS_DoctorImageUpload,HMS_DoctorSendEmail" renderAs="pdf"
+           contentType="application/x-pdf#saaassa.pdf">
+    <apex:form >
+        <div id="photoContent" style="float: left; width: 25%;display: inline-block;">
+            <apex:outputPanel id="DoctorPhoto">
+                <apex:image id="image"
+                            url="{!$Resource.doctorTemplate}"
+                            rendered="{!attachment.id == null}" width="200" height="200"/>
+                <apex:actionFunction name="rerenderDoctorImage" rerender="DoctorProfileImage,image"/>
+                <apex:image url="/servlet/servlet.FileDownload?file={!attachment.id}"
+                            id="DoctorProfileImage"
+                            rendered="{!attachment.id != null}" width="200" height="200"/>
+            </apex:outputPanel>
+        </div>
+        <div id="docDetail" style="float: right; width: auto; display: inline-block;">
+            <apex:pageBlock >
+                <apex:pageBlockSection title="{!$Label.HMS_Doctor_Details}">
+                    <apex:outputField value=" {!HMS_Doctor__c.Name}"/>
+                    <apex:outputField value=" {!HMS_Doctor__c.LastName__c}"/>
+                    <apex:outputField value=" {!HMS_Doctor__c.Phone__c}"/>
+                    <apex:outputField value="{!HMS_Doctor__c.LicensceNumber__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Others}" columns="2" id="other">
+                    <apex:outputField value="{!HMS_Doctor__c.Birthday__c}"/>
+                    <apex:outputField value="  {!HMS_Doctor__c.Email__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.HMS_Address}">
+                    <apex:outputField value="  {!HMS_Doctor__c.City__c}"/>
+                    <apex:outputField value=" {!HMS_Doctor__c.Street__c}"/>
+                    <apex:outputField value=" {!HMS_Doctor__c.Country__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </div>
+    </apex:form>
+</apex:page>

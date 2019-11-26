@@ -1,0 +1,6 @@
+<!--
+ - Created by BRITENET on 08.11.2019.
+ -->
+
+<apex:page id="HMS_DoctorsCSVSearchSearch" controller="HMS_DoctorSearchController" cache="true" contentType="text/csv#Export.csv" language="en-US" >{!csvBody}
+</apex:page>

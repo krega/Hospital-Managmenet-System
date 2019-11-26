@@ -1,0 +1,402 @@
+<apex:page id="HMS_DoctorSandrasDoctor" lightningStyleSheets="true" controller="HMS_DoctoreRestSandraController">
+    <apex:includeScript value="{!$Resource.jquery}"/>
+    <apex:includeScript value="{!$Resource.jqueryui}"/>
+    <c:Loading/>
+    <style>
+
+.slds-col{
+   padding-top: 5px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+
+}
+.actionTable{
+    width:10px;
+}
+#btn{
+      padding-top: 5px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+
+}
+
+.slds-scope .slds-modal__footer .slds-button+.slds-button {
+
+      margin-right: 1.3rem;
+
+
+}
+
+    .slds-scope .slds-input {
+        width:300px;
+    }
+    .slds-scope .slds-select_container .slds-select {
+       margin-right : 236.5px;
+    }
+    .slds-scope .slds-button--destructive {
+           margin-right: 25.7rem;
+    }
+  .slds-scope .slds-button_success, .slds-scope .slds-button--success {
+    position : absolute;
+    vertical-align: right;
+    bottom:-26px;
+    right :-4px;
+    }
+    .slds-scope .slds-button_success, .slds-scope .slds-button--success {
+        right: -10px;
+    padding-left: 0.2rem;
+    padding-right: 0.31rem;
+    background-color: rgb(177, 223, 196);
+    }
+
+    </style>
+    <apex:form>
+        <apex:slds>
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure"><span></span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span> {!$Label.HMS_Sandra_sDoctor}</span>
+                            </h2>
+                        </div>
+                        <div class="slds-no-flex">
+                            <apex:commandButton id="newDoctor"
+                                                action="{!clearNewDoctor}"
+                                                styleClass="slds-button slds-button_brand"
+                                                value="{!$Label.HMS_New_Btn}"
+                                                onClick="$('#createHDoctor').show();"
+                                                reRender="header,buttons"
+                                                status="status"/>
+                        </div>
+                    </header>
+                </div>
+            </article>
+            <apex:outputPanel id="searchValuePanel">
+                <div class="slds-grid">
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_1-of-2">
+                            <label class="slds-form-element__label"
+                                   for="text-input-id-1">{!$Label.HMS_star_icon}{!$Label.HMS_Doctor_Name}</label>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <apex:inputText value="{!searchItem.firstName}" styleClass="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_1-of-2">
+                            <label class="slds-form-element__label"
+                                   for="text-input-id-1">{!$Label.HMS_Doctor_Email}</label>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <apex:inputText value="{!searchItem.email}" styleClass="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-order_2 slds-large-order_1">
+                        <div class="slds-col slds-size_1-of-2">
+                            <label class="slds-form-element__label"
+                                   for="text-input-id-1">{!$Label.HMS_Doctor_LastName}</label>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <apex:inputText value="{!searchItem.lastName}" styleClass="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-order_2 slds-large-order_2">
+                        <div class="slds-size_1-of-2">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label"
+                                       for="select-01">{!$Label.HMS_Doctor_Country}</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <apex:selectList styleClass="slds-select"
+                                                         multiSelect="false"
+                                                         value="{!searchItem.country}" size="1">
+                                            <apex:selectOptions value="{!countries}"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <center>
+                <div id="btn">
+                    <apex:commandButton styleClass="slds-button slds-button_brand" id="searchButton"
+                                        value="{!$Label.HMS_Search_Btn}" status="status"
+                                        action="{!searchDoctor}" reRender="searchtable"/>
+                    <apex:commandButton styleClass="slds-button slds-button_brand" value="{!$Label.HMS_Clear_Btn}"
+                                        action="{!clearField}"
+                                        reRender="searchtable, searchValuePanel"/>
+                </div>
+            </center>
+            <apex:outputPanel id="searchtable">
+                <apex:outputPanel rendered="{!doctorWrapper.size > 0}" id="rend">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="actionTable">
+                                <div class="slds-truncate">{!$Label.HMS_Action_Link}</div>
+                            </th>
+                            <th>
+                                <div class="slds-truncate"> {!$Label.HMS_Doctor_Name}</div>
+                            </th>
+                            <th>
+                                <div class="slds-truncate"> {!$Label.HMS_Doctor_LastName}</div>
+                            </th>
+                            <th>
+                                <div class="slds-truncate">{!$Label.HMS_Doctor_Email}</div>
+                            </th>
+                            <th>
+                                <div class="slds-truncate">{!$Label.HMS_Doctor_Country}</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <apex:variable var="index" value="{!0}"/>
+                        <apex:repeat value="{!doctorWrapper}" var="c">
+                            <tr class="slds-hint-parent">
+                                <td>
+                                    <apex:commandLink id="updateDoctor"
+                                                      styleClass="slds-button slds-button_brand"
+                                                      value="{!$Label.HMS_update_Btn}"
+                                                      reRender="header, createHDoctor, buttons, searchtable,rend "
+                                                      action="{!fillFieldToUpdate}"
+                                                      onClick="$('#createHDoctor').show();">
+
+                                        <apex:param value="{!c.doctorId}" assignTo="{!doctorId}"
+                                                    name="doctorId"/>
+                                        <apex:param value="{!index}" assignTo="{!index}" name="index"/>
+                                    </apex:commandLink>
+                                    <apex:commandLink>
+                                        <apex:commandLink id="deleteDoctor"
+                                                          styleClass="slds-button slds-button_brand"
+                                                          value="{!$Label.HMS_Delete_btn}"
+                                                          onClick="$('#doctorDeleteConfirmDialog').show();"
+                                                          reRender="searchtable">
+                                            <apex:param value="{!c.doctorId}" assignTo="{!doctorId}"
+                                                        name="doctorId"/>
+                                        </apex:commandLink>
+                                    </apex:commandLink>
+                                </td>
+                                <td>
+                                    {!c.doctorFirstName}
+                                </td>
+                                <td>
+                                    {!c.doctorLastName}
+                                </td>
+                                <td>
+                                    {!c.doctorEmail}
+                                </td>
+                                <td>
+                                    {!c.doctorCountry}
+                                </td>
+                            </tr>
+                            <apex:variable var="index" value="{!index + 1}"/>
+                        </apex:repeat>
+                        </tbody>
+                    </table>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:actionRegion>
+                <div id="createHDoctor" style="display : none;">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <apex:outputPanel id="header">
+                                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                                        {!IF (doctorId == null, $Label.HMS_NewDoctor, $Label.HMS_UpdateDoctor) }
+                                    </h2>
+                                </apex:outputPanel>
+                            </header>
+                            <div class="slds-modal__content">
+                                <apex:outputPanel id="createHDoctor">
+                                    <div class="slds-grid slds-gutters">
+                                        <div class="slds-col">
+                                            <div class="slds-form-element__control">
+
+                                                <label class="slds-form-element__label"><abbr
+                                                            class="slds-required"
+                                                    >{!$Label.HMS_star_icon} </abbr>
+                                                    {!$label.HMS_Doctor_Name}</label>
+                                                <apex:inputText value="{!item.firstName}" styleClass="slds-input"/>
+                                            </div>
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label"><abbr
+                                                            class="slds-required"
+                                                    >{!$Label.HMS_star_icon} </abbr>
+                                                    {!$label.HMS_Doctor_LastName}</label>
+                                                <apex:inputText value="{!item.lastName}" styleClass="slds-input"/>
+                                            </div>
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label"><abbr
+                                                            class="slds-required"
+                                                    >{!$Label.HMS_star_icon}</abbr>
+                                                    {!$Label.HMS_Doctor_Email}</label>
+                                                <apex:inputText value="{!item.email}" styleClass="slds-input"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col">
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label"><abbr
+                                                            class="slds-required"
+                                                    >{!$Label.HMS_star_icon} </abbr>
+                                                    {!$Label.HMS_Doctor_City}</label>
+                                                <apex:inputText value="{!item.city }" styleClass="slds-input"/>
+                                            </div>
+                                            <div class="slds-form-element__control">
+                                                <label class="slds-form-element__label"><abbr
+                                                            class="slds-required"
+                                                    >{!$Label.HMS_star_icon} </abbr>
+                                                    {!$Label.HMS_DoctorStreet}</label>
+                                                <apex:inputText value="{!item.street}" styleClass="slds-input"/>
+                                            </div>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label"
+                                                           for="select-01">{!$Label.HMS_Doctor_Country}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-select_container">
+                                                            <apex:selectList styleClass="slds-select"
+                                                                             multiSelect="false"
+                                                                             value="{!item.country}" size="1">
+                                                                <apex:selectOptions value="{!countries}"/>
+                                                            </apex:selectList>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:outputPanel>
+                            </div>
+                            <footer class="slds-modal__footer slds-modal__footer_directional">
+                                <div>
+                                    <center>
+                                        <apex:outputPanel id="buttons">
+                                            <apex:commandButton id="newDoctorModalCancel"
+                                                                styleClass="slds-button slds-button_neutral"
+                                                                value="{!$Label.HMS_Cancel_Btn}"
+                                                                onClick="$('#createHDoctor').hide();"
+                                                                reRender="createHDoctor"
+                                                                action="{!clearNewDoctor}"/>
+                                            <apex:commandButton id="newDoctorModalCreate"
+                                                                styleClass="slds-button slds-button_neutral"
+                                                                value="{!$Label.HMS_Create_Btn}"
+                                                                action="{!addDoctor}"
+                                                                reRender="createHDoctor, errToast, updateDoctorModal,searchtable, searchValuePanel"
+                                                                onComplete="if({!message.messageError == ''})$('#createHDoctor').hide();"
+                                                                rendered="{!doctorId == null}"/>
+                                            <apex:commandButton id="updateModalCreate"
+                                                                styleClass="slds-button slds-button_neutral"
+                                                                value="{!$Label.HMS_update_Btn}"
+                                                                action="{!editDoctor}"
+
+                                                                reRender="createHDoctor, errToast, updateDoctorModal,searchtable, searchValuePanel"
+                                                                onComplete="if({!message.messageError == ''})$('#createHDoctor').hide();"
+
+                                                                rendered="{!doctorId != null}"/>
+
+                                        </apex:outputPanel>
+                                    </center>
+                                </div>
+
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </div>
+            </apex:actionRegion>
+            <div id="doctorDeleteConfirmDialog" style="display : none;">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                         aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01"
+                                class="slds-modal__title slds-hyphenate">{!$Label.HMS_Doctor_delete}</h2>
+                            <p class="slds-m-top_x-small">{!$Label.HMS_Question_Delete_doctor} </p>
+                        </header>
+                        <footer class="slds-modal__footer">
+                            <center>
+                            <button class="slds-button slds-button_neutral"
+                                    onClick="$('#doctorDeleteConfirmDialog').hide();"
+                                    id="canceldoctorDeleteConfirmDialog">{!$Label.HMS_Cancel_Btn}
+                            </button>
+                            <apex:commandButton id="deleteDoctorButton"
+                                                styleClass="slds-button slds-button_destructive"
+                                                value="{!$Label.HMS_Doctor_delete}"
+                                                action="{!deleteDoctor}"
+                                                status="status"
+                                                reRender="searchtable, searchValuePanel"
+                                                onClick="$('#doctorDeleteConfirmDialog').hide();"/>
+                            </center>
+                        </footer>
+                    </div>
+                </section>
+            </div>
+            <apex:outputPanel id="errToast">
+                <apex:outputPanel rendered="{!NOT(ISNULL(message)) && message != ''}" >
+                  <!--  -->
+                    <div class="demo-only" style="height:4rem">
+                        <div class="slds-notify_container slds-is-relative">
+                            <div class="slds-notify slds-notify_toast slds-theme_info" role="status">
+                                <apex:outputText rendered="{!message.messageError != null && message.messageError !=''}"
+                                                 value="{!message.messageError}"/>
+                                <apex:outputText rendered="{!message.messageError == null && message.messageError ==''}"
+                                                 value="{!$Label.HMS_Update_OK}"/>
+                                <div class="slds-notify__close">
+                                    <footer class="slds-modal__footer">
+                                        <apex:commandButton id="errToastClose" immediate="true"
+                                                            styleClass="slds-button slds-button_success"
+                                                            value="{!$Label.HMS_Close_Btn}"
+                                                            action="{!clearMessage}"
+                                                            reRender="errToast"/>
+                                    </footer>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:slds>
+    </apex:form>
+    <script>
+    $(document).ready(function(){
+
+    $("#newDoctor").click(function(){
+        $("#createHDoctor").hide();
+    });
+
+    $("#newDoctor").click(function(){
+        $("#createHDoctor").show();
+    });
+
+
+     $("#newDoctor").click(function(){
+        $("#doctorDeleteConfirmDialog").hide();
+    });
+
+    $("#newDoctor").click(function(){
+        $("#doctorDeleteConfirmDialog").show();
+    });
+ function closeDialog(dialogId) {
+            $(dialogId).dialog('close');
+        }
+
+    </script>
+</apex:page>
