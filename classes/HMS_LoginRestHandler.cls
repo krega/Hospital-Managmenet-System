@@ -1,14 +1,17 @@
 public with sharing class HMS_LoginRestHandler {
 
         public static Boolean isTokenAvailable() {
+
             return ((String) Cache.Org.get('token') != null);
         }
 
         public static String getAccessTokenToEndpoint() {
             if (isTokenAvailable()) {
+                System.debug('isavailable');
                 return (String) Cache.Org.get('token');
 
             } else {
+                System.debug('isnotavailable');
                 return updateAccessToken();
             }
         }
@@ -21,25 +24,34 @@ public with sharing class HMS_LoginRestHandler {
         }
 
         public static String updateAccessToken() {
+            System.debug('updateaccasToken');
             HMS_LoginResponseBodyWrapper loginResponse = getExternalServiceAccessToken();
+            System.debug(loginResponse);
             String token = 'Bearer ' + loginResponse.access_token;
             Cache.Org.put('token', token, 28800);
+            System.debug(token);
             return (String) Cache.Org.get('token');
         }
 
-        public static HMS_LoginResponseBodyWrapper getExternalServiceAccessToken() {
+            public static HMS_LoginResponseBodyWrapper getExternalServiceAccessToken() {
             HttpRequest req = new HttpRequest();
             req.setMethod('POST');
             req.setEndpoint( HMS_Utils.getCustomSettingValue('loginUri'));
             req.setBody(buildLoginCredentialsUri());
-            HMS_EventHandler.saveEvent( null, HMS_Utils.getCustomSettingValue('loginUri'), req.getMethod(), req.getBody(),null, null,null);
+        // HttpResponse response = authorizationCalloutResponse(req);
+                System.debug(req);
+             //    HMS_EventHandler.saveEvent(null, HMS_Utils.getCustomSettingValue('login'), req.getMethod(), req.getBody(), null, null, null, 1);
+                System.debug('jestem');
+                System.debug(req);
             HMS_LoginResponseBodyWrapper loginResponseBody = (HMS_LoginResponseBodyWrapper) JSON.deserialize(authorizationCalloutResponse(req), HMS_LoginResponseBodyWrapper.class);
+                System.debug(loginResponseBody);
             return loginResponseBody;
         }
 
         public static String authorizationCalloutResponse(HttpRequest request) {
             Http http = new Http();
             HTTPResponse response = http.send(request);
+            System.debug(request);
             return response.getBody();
         }
 

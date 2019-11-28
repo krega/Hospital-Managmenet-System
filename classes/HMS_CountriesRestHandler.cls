@@ -24,10 +24,13 @@ public with sharing class HMS_CountriesRestHandler {
     public static List<String> getListOfCountriesStrings() {
         HttpRequest request = getRequest('GET',  null, null);
         HttpResponse response = new Http().send(request);
-        HMS_EventHandler.saveEvent(null, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+
+
+        HMS_EventHandler.saveEvent(null, getEndpoint(null),request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
+
         if (!HMS_LoginRestHandler.verifyEndpointAuthorization(response.getStatusCode())) {
             response = new Http().send(request);
-            HMS_EventHandler.saveEvent(null, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+            HMS_EventHandler.saveEvent(null, getEndpoint(null),request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
         }
         if (response.getStatusCode() == 200) {
             Cache.Org.put('countries', (List<String>) JSON.deserialize(response.getBody(),List<String>.class));

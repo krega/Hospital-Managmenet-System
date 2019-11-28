@@ -63,12 +63,13 @@ public with sharing class HMS_DoctoreRestSandraControllerHandler {
     public static HttpResponse saveNewDoctorCallout( HMS_DoctorRequestBodyWrapper operationItem) {
         HttpRequest request = getRequest('POST',  null, buildPostRequestBody(operationItem));
         HttpResponse response = new Http().send(request);
-        HMS_EventHandler.saveEvent( operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+        HMS_EventHandler.saveEvent(operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
+
         if (HMS_LoginRestHandler.verifyEndpointAuthorization(response.getStatusCode() )) {
             request = getRequest('POST',  null,
                     buildPostRequestBody(operationItem));
             response = new Http().send(request);
-            HMS_EventHandler.saveEvent( operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+            HMS_EventHandler.saveEvent(operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
         }
         return response;
     }
@@ -85,23 +86,25 @@ public with sharing class HMS_DoctoreRestSandraControllerHandler {
     public static HttpResponse editDoctorCallout( HMS_DoctorRequestBodyWrapper operationItem) {
         HttpRequest request = getRequest('PUT',  null, buildPutRequestBody(operationItem));
         HttpResponse response = new Http().send(request);
-        HMS_EventHandler.saveEvent( operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+        HMS_EventHandler.saveEvent(operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
+
         if (HMS_LoginRestHandler.verifyEndpointAuthorization(response.getStatusCode())) {
             request = getRequest('PUT',  null,
                     buildPutRequestBody(operationItem));
             response = new Http().send(request);
-            HMS_EventHandler.saveEvent( operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+            HMS_EventHandler.saveEvent(operationItem.id, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
+
         }
         return response;
     }
     public static List<HMS_DoctorResponseWrapper>   getDoctorCallout( String parameters) {
         HttpRequest request = getRequest('GET', parameters, null);
         HttpResponse response = new Http().send(request);
-        HMS_EventHandler.saveEvent(null, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+        HMS_EventHandler.saveEvent(null, getEndpoint(parameters), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
         if (!HMS_LoginRestHandler.verifyEndpointAuthorization(response.getStatusCode() )) {
             request = getRequest('GET', parameters, null);
             response = new Http().send(request);
-            HMS_EventHandler.saveEvent(null, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+            HMS_EventHandler.saveEvent(null, getEndpoint(parameters), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
         }
         if (response.getStatusCode() == 200) {
             return getDoctorsResponseWrappers(response.getBody());
@@ -119,11 +122,14 @@ public with sharing class HMS_DoctoreRestSandraControllerHandler {
         String isExternalId = (String.isBlank(externalId))?'':externalId;
         HttpRequest request = getRequest('DELETE',   'id=' + doctorId + '&externalId=' + isExternalId, null);
         HttpResponse response = new Http().send(request);
-        HMS_EventHandler.saveEvent(doctorId, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+        HMS_EventHandler.saveEvent(doctorId, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(),response.getBody(), 1);
+
         if (HMS_LoginRestHandler.verifyEndpointAuthorization(response.getStatusCode() )) {
             request = getRequest('DELETE',   'id=' + doctorId + '&externalId=' + isExternalId, null);
             response = new Http().send(request);
-            HMS_EventHandler.saveEvent( doctorId, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody());
+
+            HMS_EventHandler.saveEvent(doctorId, getEndpoint(null), request.getMethod(), request.getBody(), response.getStatusCode(), response.getStatus(), response.getBody(), 1);
+
         }
         return response;
     }
